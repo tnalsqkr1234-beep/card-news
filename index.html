@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐾 Petsland 카드뉴스 에디터</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;700;900&family=Black+Han+Sans&family=Sunflower:wght@300;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --cream:#FFF9F4;--sand:#F5EFE8;--beige:#EDE5DB;
+  --bd:#2C1810;--bm:#8B6F5E;--gold:#C4956A;--sage:#7A9E7E;
+  --terra:#C97B5B;--lsage:#D4E8D6;--lgold:#F2E0CB;
+  --panelW:420px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--beige);color:var(--bd);height:100vh;overflow:hidden;}
+
+/* HEADER */
+header{background:var(--bd);color:var(--cream);padding:12px 26px;display:flex;align-items:center;justify-content:space-between;height:48px;}
+.hl{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;letter-spacing:.05em;}
+.hl span{color:var(--gold);}
+.hbtns{display:flex;gap:8px;}
+.hbtn{background:rgba(255,249,244,.12);color:var(--cream);border:1px solid rgba(255,249,244,.2);border-radius:7px;padding:5px 13px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.03em;}
+.hbtn:hover{background:var(--gold);border-color:var(--gold);color:var(--bd);}
+.hbtn.primary{background:var(--gold);border-color:var(--gold);color:var(--bd);}
+.hbtn.primary:hover{background:var(--terra);border-color:var(--terra);color:#fff;}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:var(--panelW) 1fr;height:calc(100vh - 48px);}
+
+/* ── LEFT PANEL ── */
+.panel{background:var(--cream);border-right:1px solid var(--sand);display:flex;flex-direction:column;height:100%;overflow:hidden;}
+
+/* TABS */
+.tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--sand);flex-shrink:0;}
+.tab{padding:11px 0;border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--bm);letter-spacing:.04em;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tab.active{color:var(--bd);border-bottom-color:var(--gold);}
+.tab:hover:not(.active){color:var(--bd);}
+
+/* PANEL BODY */
+.panel-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:18px 18px 24px;}
+.panel-body::-webkit-scrollbar{width:4px;}
+.panel-body::-webkit-scrollbar-track{background:transparent;}
+.panel-body::-webkit-scrollbar-thumb{background:var(--sand);border-radius:2px;}
+
+/* FORM ELEMENTS */
+.sec{margin-bottom:14px;}
+.st{font-size:10px;font-weight:700;letter-spacing:.13em;color:var(--bm);text-transform:uppercase;margin-bottom:6px;}
+.divider{height:1px;background:var(--sand);margin:12px 0;}
+.ig{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.ig label{font-size:11px;font-weight:700;color:var(--bm);}
+.ig input,.ig textarea,.ig select{border:1.5px solid var(--sand);border-radius:7px;padding:8px 10px;font-family:inherit;font-size:12px;color:var(--bd);background:#fff;resize:vertical;outline:none;transition:border-color .2s;}
+.ig input:focus,.ig textarea:focus,.ig select:focus{border-color:var(--gold);}
+.ig textarea{min-height:58px;}
+.frow{display:grid;grid-template-columns:38px 1fr;gap:5px;}
+.frow input:first-child{text-align:center;}
+
+/* MODE SELECTOR */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.mb{padding:10px 7px;border:2px solid var(--sand);background:#fff;border-radius:9px;cursor:pointer;text-align:center;transition:all .2s;font-family:inherit;}
+.mb .mi{font-size:18px;display:block;margin-bottom:2px;}
+.mb .ml{font-size:11px;font-weight:700;color:var(--bm);}
+.mb .md{font-size:9px;color:#bbb;margin-top:1px;}
+.mb.active{border-color:var(--gold);background:var(--lgold);}
+.mb.active .ml{color:var(--bd);}
+
+/* GENERATE BTN */
+.gen-btn{background:var(--bd);color:var(--cream);border:none;border-radius:9px;padding:12px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;margin-top:6px;letter-spacing:.03em;}
+.gen-btn:hover{background:var(--terra);transform:translateY(-1px);}
+
+/* ── STYLE TAB ── */
+.style-card-selector{background:var(--lgold);border-radius:9px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.scs-num{background:var(--bd);color:var(--gold);font-size:9px;font-weight:700;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.scs-info{flex:1;}
+.scs-name{font-size:13px;font-weight:700;color:var(--bd);}
+.scs-sub{font-size:10px;color:var(--bm);}
+.scs-arrows{display:flex;gap:5px;}
+.scs-arrow{width:26px;height:26px;border-radius:50%;background:#fff;border:1.5px solid var(--bm);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--bd);}
+.scs-arrow:hover{background:var(--bd);color:var(--cream);}
+.scs-arrow:disabled{opacity:.3;cursor:default;}
+
+/* SLIDER ROW */
+.sl-row{display:grid;grid-template-columns:1fr 42px;gap:8px;align-items:center;margin-bottom:8px;}
+.sl-label{font-size:11px;font-weight:700;color:var(--bm);}
+.sl-val{font-size:11px;font-weight:700;color:var(--bd);text-align:right;}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--sand);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+
+/* IMAGE STYLE RADIO */
+.img-style-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;}
+.is-opt{border:1.5px solid var(--sand);border-radius:7px;padding:6px 4px;cursor:pointer;text-align:center;transition:all .2s;background:#fff;}
+.is-opt:hover,.is-opt.active{border-color:var(--gold);background:var(--lgold);}
+.is-opt .io-i{font-size:14px;display:block;margin-bottom:2px;}
+.is-opt .io-l{font-size:9px;font-weight:700;color:var(--bd);}
+
+/* IMAGE UPLOAD IN STYLE TAB */
+.st-img-upload{border:2px dashed var(--sand);border-radius:9px;padding:12px;cursor:pointer;transition:all .2s;text-align:center;background:#fff;position:relative;margin-bottom:8px;}
+.st-img-upload:hover{border-color:var(--gold);background:var(--lgold);}
+.st-img-upload .uico{font-size:22px;margin-bottom:4px;}
+.st-img-upload .utxt{font-size:11px;color:var(--bm);font-weight:600;}
+.st-thumb{width:100%;height:90px;object-fit:cover;border-radius:7px;display:block;margin-bottom:6px;}
+.st-remove-btn{background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;color:var(--bm);font-family:inherit;width:100%;transition:all .2s;}
+.st-remove-btn:hover{background:#fee;border-color:#f88;color:#c33;}
+
+/* FONT SELECT */
+.font-select{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;}
+.font-opt{border:1.5px solid var(--sand);border-radius:7px;padding:6px 8px;cursor:pointer;text-align:center;transition:all .2s;background:#fff;}
+.font-opt:hover,.font-opt.active{border-color:var(--gold);background:var(--lgold);}
+.font-opt .fo-name{font-size:12px;font-weight:700;color:var(--bd);}
+.font-opt .fo-sample{font-size:9px;color:var(--bm);margin-top:1px;}
+
+/* SECTION COLLAPSE */
+.sec-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:6px 0;user-select:none;}
+.sec-header .sec-title-txt{font-size:10px;font-weight:700;letter-spacing:.13em;color:var(--bm);text-transform:uppercase;}
+.sec-header .sec-arrow{font-size:10px;color:var(--bm);transition:transform .2s;}
+.sec-header.open .sec-arrow{transform:rotate(180deg);}
+.sec-body{display:none;}
+.sec-body.open{display:block;}
+
+/* ── PREVIEW ── */
+.prev{background:var(--sand);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;position:relative;}
+.prev-top{display:flex;align-items:center;gap:12px;width:100%;max-width:500px;justify-content:space-between;}
+.card-counter{font-size:12px;font-weight:700;color:var(--bm);background:var(--cream);padding:4px 13px;border-radius:18px;}
+.pacts{display:flex;gap:6px;}
+.ab{background:var(--bd);color:var(--cream);border:none;border-radius:7px;padding:6px 13px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;}
+.ab:hover{background:var(--terra);}
+.ab.s{background:var(--cream);color:var(--bd);border:1.5px solid var(--bm);}
+.ab.s:hover{background:var(--lgold);border-color:var(--gold);}
+
+/* CARD FRAME */
+.card-frame{width:480px;height:480px;border-radius:4px;box-shadow:0 8px 40px rgba(44,24,16,.18);overflow:hidden;position:relative;background:var(--cream);}
+
+/* NAV */
+.card-nav{display:flex;align-items:center;gap:13px;}
+.nav-btn{width:36px;height:36px;border-radius:50%;background:var(--cream);border:1.5px solid var(--bm);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--bd);}
+.nav-btn:hover{background:var(--bd);color:var(--cream);}
+.nav-btn:disabled{opacity:.3;cursor:default;}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--bm);opacity:.3;cursor:pointer;transition:all .2s;}
+.dot.active{opacity:1;background:var(--bd);width:16px;border-radius:3px;}
+
+/* DOWNLOAD PROGRESS */
+.dlp{position:fixed;bottom:20px;right:20px;background:var(--bd);color:var(--cream);padding:10px 16px;border-radius:9px;font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none;z-index:1000;}
+
+/* ══ CARD CSS ══ */
+.ci{width:100%;height:100%;position:relative;overflow:hidden;}
+
+/* cover */
+.cc{background:linear-gradient(150deg,var(--cream) 0%,var(--lgold) 50%,var(--sand) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+.cc .cd{position:absolute;top:0;right:0;width:100px;height:100px;background:var(--gold);opacity:.12;border-radius:0 0 0 100px;}
+.cc .cdbl{position:absolute;bottom:0;left:0;width:70px;height:70px;background:var(--sage);opacity:.15;border-radius:0 70px 0 0;}
+.bt{font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;background:var(--bd);padding:3px 10px;border-radius:18px;display:inline-block;}
+.bt.l{color:var(--bd);background:var(--gold);}
+.cpaw{position:absolute;bottom:14px;left:20px;font-size:11px;color:var(--gold);letter-spacing:3px;opacity:.6;}
+.cnum-badge{position:absolute;bottom:14px;right:20px;font-size:9px;color:var(--bm);font-weight:700;}
+.cnum-badge.l{color:rgba(255,249,244,.55);}
+
+/* intro */
+.ci-in{background:var(--bd);display:flex;flex-direction:column;padding:30px 26px;}
+.itag{font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.iitems{display:flex;flex-direction:column;gap:9px;flex:1;}
+.iitem{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,249,244,.07);border-radius:8px;border-left:3px solid var(--gold);}
+.inum{font-size:15px;font-weight:900;color:var(--gold);min-width:20px;line-height:1;}
+.itxt{font-size:11.5px;color:var(--cream);font-weight:500;line-height:1.5;word-break:keep-all;}
+.ifooter{margin-top:14px;font-size:8.5px;color:rgba(255,249,244,.35);letter-spacing:.1em;font-weight:700;text-transform:uppercase;}
+
+/* feature */
+.cf{background:var(--cream);display:flex;flex-direction:column;}
+.fh{background:var(--lgold);position:relative;flex-shrink:0;}
+.fh::after{content:'';position:absolute;bottom:-14px;left:0;right:0;height:28px;background:var(--lgold);clip-path:ellipse(55% 100% at 50% 0);}
+.fnm{font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:2px;}
+.fit{display:flex;align-items:center;gap:7px;}
+.fb{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.fhi{background:var(--lsage);border-radius:7px;padding:8px 11px;color:#3D6B41;font-weight:600;border-left:3px solid var(--sage);line-height:1.5;word-break:keep-all;}
+.cfoot{border-top:1px solid var(--sand);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:9px 22px;}
+.bm-txt{font-size:9px;font-weight:700;letter-spacing:.11em;color:var(--bm);text-transform:uppercase;}
+.pm-txt{font-size:9px;color:var(--bm);}
+
+/* target */
+.ct{background:var(--cream);display:flex;flex-direction:column;}
+.ttag{font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:5px;}
+.titems{display:flex;flex-direction:column;flex:1;}
+.titem{display:flex;align-items:center;gap:10px;background:var(--lgold);border-radius:9px;}
+
+/* detail */
+.cd-c{background:var(--sand);display:flex;flex-direction:column;}
+.dtag{font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--terra);text-transform:uppercase;margin-bottom:5px;}
+.ditems{display:flex;flex-direction:column;flex:1;}
+.drow{display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,.6);border-radius:7px;}
+.dlbl{font-size:10px;font-weight:700;color:var(--terra);flex-shrink:0;}
+.dval{font-size:11px;color:var(--bd);line-height:1.5;word-break:keep-all;font-weight:500;}
+.dcirc{position:absolute;right:-25px;top:50px;width:110px;height:110px;border-radius:50%;background:var(--gold);opacity:.1;}
+
+/* summary */
+.cs{background:linear-gradient(135deg,var(--sand) 0%,var(--beige) 100%);display:flex;flex-direction:column;}
+.stag{font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--sage);text-transform:uppercase;margin-bottom:6px;}
+.slist{display:flex;flex-direction:column;flex:1;}
+.sitem{display:flex;gap:8px;align-items:flex-start;}
+.sdot{width:19px;height:19px;border-radius:50%;background:var(--sage);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* cta */
+.cta-c{background:var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+.bgd1{position:absolute;top:-36px;right:-36px;width:135px;height:135px;border-radius:50%;background:var(--gold);opacity:.13;}
+.bgd2{position:absolute;bottom:-44px;left:-44px;width:155px;height:155px;border-radius:50%;background:var(--sage);opacity:.11;}
+
+/* caution */
+.cau-c{background:var(--lsage);display:flex;flex-direction:column;}
+.cautag{font-size:9px;font-weight:700;letter-spacing:.14em;color:#3D6B41;text-transform:uppercase;margin-bottom:5px;}
+.cauitems{display:flex;flex-direction:column;flex:1;}
+.cauitem{display:flex;gap:7px;align-items:flex-start;background:rgba(255,255,255,.7);border-radius:7px;}
+
+/* placeholder */
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:36px;background:var(--cream);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hl">🐾 <span>PETSLAND</span> &nbsp;카드뉴스 에디터</div>
+  <div class="hbtns">
+    <button class="hbtn" onclick="downloadCurrentCard()">⬇ 현재 카드</button>
+    <button class="hbtn primary" onclick="downloadAllCards()">📦 전체 저장</button>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- ══ LEFT PANEL ══ -->
+  <div class="panel">
+    <div class="tabs">
+      <button class="tab active" id="tab-content-btn" onclick="switchTab('content')">✏️ 내용 입력</button>
+      <button class="tab" id="tab-style-btn" onclick="switchTab('style')">🎨 카드 스타일</button>
+    </div>
+
+    <!-- ── CONTENT TAB ── -->
+    <div class="panel-body" id="tab-content">
+      <div class="mg">
+        <button class="mb active" onclick="setMode('product')" id="btn-product">
+          <span class="mi">🛍️</span><div class="ml">제품 소개</div><div class="md">홍보 · 기능 설명</div>
+        </button>
+        <button class="mb" onclick="setMode('info')" id="btn-info">
+          <span class="mi">🐶</span><div class="ml">정보 · 팁</div><div class="md">케어 · 정보 콘텐츠</div>
+        </button>
+      </div>
+
+      <!-- PRODUCT FORM -->
+      <div id="form-product" style="display:flex;flex-direction:column;">
+        <div class="ig"><label>제품명</label><input type="text" id="p-name" placeholder="예: 에어메시 하네스 V2"></div>
+        <div class="ig"><label>메인 카피 (슬로건)</label><input type="text" id="p-tagline" placeholder="예: 통기성과 안전함, 둘 다 잡다"></div>
+        <div class="ig"><label>카테고리 이모지</label><input type="text" id="p-icon" placeholder="🦮" maxlength="4" style="max-width:64px"></div>
+        <div class="divider"></div>
+        <div class="st">추천 대상</div>
+        <div class="ig"><label>상황 1</label><div class="frow"><input type="text" id="p-t1-icon" placeholder="🐾" maxlength="4"><input type="text" id="p-t1" placeholder="예: 당김이 심한 반려견"></div></div>
+        <div class="ig"><label>상황 2</label><div class="frow"><input type="text" id="p-t2-icon" placeholder="🌿" maxlength="4"><input type="text" id="p-t2" placeholder="예: 피부가 예민한 반려견"></div></div>
+        <div class="ig"><label>상황 3</label><div class="frow"><input type="text" id="p-t3-icon" placeholder="☀️" maxlength="4"><input type="text" id="p-t3" placeholder="예: 여름 산책을 즐기는 아이"></div></div>
+        <div class="divider"></div>
+        <div class="st">핵심 기능 3가지</div>
+        <div class="ig"><label>기능 1</label>
+          <div class="frow"><input type="text" id="p-f1-icon" placeholder="🌬️" maxlength="4"><input type="text" id="p-f1-title" placeholder="예: 3D 에어메시 소재"></div>
+          <textarea id="p-f1-desc" placeholder="기능 설명"></textarea>
+          <input type="text" id="p-f1-tip" placeholder="💡 포인트 팁 (선택)">
+        </div>
+        <div class="ig"><label>기능 2</label>
+          <div class="frow"><input type="text" id="p-f2-icon" placeholder="🔒" maxlength="4"><input type="text" id="p-f2-title" placeholder="예: 이중 잠금 버클"></div>
+          <textarea id="p-f2-desc" placeholder="기능 설명"></textarea>
+          <input type="text" id="p-f2-tip" placeholder="💡 포인트 팁 (선택)">
+        </div>
+        <div class="ig"><label>기능 3</label>
+          <div class="frow"><input type="text" id="p-f3-icon" placeholder="🎨" maxlength="4"><input type="text" id="p-f3-title" placeholder="예: 미니멀 디자인"></div>
+          <textarea id="p-f3-desc" placeholder="기능 설명"></textarea>
+          <input type="text" id="p-f3-tip" placeholder="💡 포인트 팁 (선택)">
+        </div>
+        <div class="divider"></div>
+        <div class="st">소재 & 스펙</div>
+        <div class="ig"><label>겉감</label><input type="text" id="p-s1" placeholder="예: 3D 에어메시 (폴리에스터 100%)"></div>
+        <div class="ig"><label>안감/패딩</label><input type="text" id="p-s2" placeholder="예: 네오프렌 패딩"></div>
+        <div class="ig"><label>부자재</label><input type="text" id="p-s3" placeholder="예: 듀라플렉스 버클, 알루미늄 D링"></div>
+        <div class="ig"><label>사이즈</label><input type="text" id="p-s4" placeholder="예: XS~XL / 흉둘레 28~72cm"></div>
+        <div class="ig"><label>특이사항</label><input type="text" id="p-s5" placeholder="예: 야간 반사 파이핑 내장"></div>
+        <div class="divider"></div>
+        <div class="st">CTA 정보</div>
+        <div class="ig"><label>헤드라인</label><input type="text" id="p-cta-title" placeholder="예: 지금 펫츠랜드에서 만나보세요"></div>
+        <div class="ig"><label>서브 텍스트</label><input type="text" id="p-cta-sub" placeholder="예: 출시 기념 10% 할인 진행 중"></div>
+        <div class="ig"><label>링크/채널</label><input type="text" id="p-cta-link" placeholder="예: 프로필 링크 · 스마트스토어"></div>
+      </div>
+
+      <!-- INFO FORM -->
+      <div id="form-info" style="display:none;flex-direction:column;">
+        <div class="ig"><label>주제/제목</label><input type="text" id="i-title" placeholder="예: 강아지 여름 산책, 이것만 지켜요"></div>
+        <div class="ig"><label>서브 카피</label><input type="text" id="i-sub" placeholder="예: 더운 여름 우리 아이를 지키는 방법"></div>
+        <div class="ig"><label>주제 이모지</label><input type="text" id="i-icon" placeholder="☀️" maxlength="4" style="max-width:64px"></div>
+        <div class="divider"></div>
+        <div class="st">핵심 팁 3가지</div>
+        <div class="ig"><label>팁 1</label>
+          <div class="frow"><input type="text" id="i-f1-icon" placeholder="⏰" maxlength="4"><input type="text" id="i-f1-title" placeholder="예: 산책 시간 조정하기"></div>
+          <textarea id="i-f1-desc" placeholder="팁 설명"></textarea>
+          <input type="text" id="i-f1-tip" placeholder="💡 꿀팁 (선택)">
+        </div>
+        <div class="ig"><label>팁 2</label>
+          <div class="frow"><input type="text" id="i-f2-icon" placeholder="💧" maxlength="4"><input type="text" id="i-f2-title" placeholder="팁 제목"></div>
+          <textarea id="i-f2-desc" placeholder="팁 설명"></textarea>
+          <input type="text" id="i-f2-tip" placeholder="💡 꿀팁 (선택)">
+        </div>
+        <div class="ig"><label>팁 3</label>
+          <div class="frow"><input type="text" id="i-f3-icon" placeholder="🌡️" maxlength="4"><input type="text" id="i-f3-title" placeholder="팁 제목"></div>
+          <textarea id="i-f3-desc" placeholder="팁 설명"></textarea>
+          <input type="text" id="i-f3-tip" placeholder="💡 꿀팁 (선택)">
+        </div>
+        <div class="divider"></div>
+        <div class="st">주의사항 3가지</div>
+        <div class="ig"><label>주의 1</label><div class="frow"><input type="text" id="i-c1-icon" placeholder="❌" maxlength="4"><input type="text" id="i-c1" placeholder="주의사항 입력"></div></div>
+        <div class="ig"><label>주의 2</label><div class="frow"><input type="text" id="i-c2-icon" placeholder="⚠️" maxlength="4"><input type="text" id="i-c2" placeholder="주의사항 입력"></div></div>
+        <div class="ig"><label>주의 3</label><div class="frow"><input type="text" id="i-c3-icon" placeholder="🚫" maxlength="4"><input type="text" id="i-c3" placeholder="주의사항 입력"></div></div>
+        <div class="divider"></div>
+        <div class="st">핵심 요약</div>
+        <div class="ig"><label>요약 1</label><input type="text" id="i-sum1" placeholder="예: 오전 7~9시 산책 추천"></div>
+        <div class="ig"><label>요약 2</label><input type="text" id="i-sum2" placeholder="예: 30분마다 물 급수"></div>
+        <div class="ig"><label>요약 3</label><input type="text" id="i-sum3" placeholder="예: 통기성 하네스 착용"></div>
+        <div class="ig"><label>마무리 코멘트</label><input type="text" id="i-sum-footer" placeholder="예: 우리 아이의 안전한 여름을 응원합니다 🐾"></div>
+        <div class="divider"></div>
+        <div class="st">CTA 정보</div>
+        <div class="ig"><label>헤드라인</label><input type="text" id="i-cta-title" placeholder="예: 더 많은 케어 팁이 궁금하다면?"></div>
+        <div class="ig"><label>서브 텍스트</label><input type="text" id="i-cta-sub" placeholder="예: 팔로우하면 매주 유용한 정보를 드려요"></div>
+        <div class="ig"><label>링크/채널</label><input type="text" id="i-cta-link" placeholder="예: @petsland_official 팔로우"></div>
+      </div>
+
+      <button class="gen-btn" onclick="generateCards()">🎨 카드뉴스 생성하기</button>
+    </div><!-- /tab-content -->
+
+    <!-- ── STYLE TAB ── -->
+    <div class="panel-body" id="tab-style" style="display:none;">
+
+      <!-- Card selector -->
+      <div class="style-card-selector">
+        <div class="scs-num" id="scs-num">01</div>
+        <div class="scs-info">
+          <div class="scs-name" id="scs-name">카드를 먼저 생성해주세요</div>
+          <div class="scs-sub" id="scs-sub">← → 으로 카드 이동</div>
+        </div>
+        <div class="scs-arrows">
+          <button class="scs-arrow" onclick="styleNav(-1)" id="scs-prev">‹</button>
+          <button class="scs-arrow" onclick="styleNav(1)" id="scs-next">›</button>
+        </div>
+      </div>
+
+      <!-- 이미지 섹션 -->
+      <div class="sec">
+        <div class="sec-header open" onclick="toggleSec(this)">
+          <span class="sec-title-txt">🖼️ 이미지</span>
+          <span class="sec-arrow">▼</span>
+        </div>
+        <div class="sec-body open">
+          <!-- Upload area -->
+          <div id="st-upload-area" class="st-img-upload" onclick="document.getElementById('st-file-input').click()"
+               ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
+               ondragleave="this.style.borderColor=''"
+               ondrop="stHandleDrop(event)">
+            <input type="file" id="st-file-input" accept="image/*" style="display:none" onchange="stHandleImg(event)">
+            <div id="st-upload-ph"><div class="uico">📸</div><div class="utxt">클릭 또는 드래그</div></div>
+            <img id="st-thumb" class="st-thumb" style="display:none">
+          </div>
+          <button id="st-remove-btn" class="st-remove-btn" style="display:none" onclick="stRemoveImg()">✕ 이미지 제거</button>
+
+          <!-- 이미지 스타일 (per-card) -->
+          <div class="st" style="margin-top:10px;">이미지 스타일</div>
+          <div class="img-style-grid">
+            <div class="is-opt" id="is-none" onclick="setCardImgStyle('none')"><span class="io-i">🚫</span><div class="io-l">없음</div></div>
+            <div class="is-opt" id="is-top" onclick="setCardImgStyle('top')"><span class="io-i">📷</span><div class="io-l">상단</div></div>
+            <div class="is-opt" id="is-side" onclick="setCardImgStyle('side')"><span class="io-i">◧</span><div class="io-l">사이드</div></div>
+            <div class="is-opt" id="is-bg" onclick="setCardImgStyle('bg')"><span class="io-i">🌅</span><div class="io-l">배경</div></div>
+          </div>
+
+          <!-- 이미지 조정 -->
+          <div id="img-adjust-section">
+            <div class="sl-row">
+              <div>
+                <div class="sl-label">확대/축소</div>
+                <input type="range" id="sl-zoom" min="50" max="300" value="100" oninput="onSl('imgZoom',this.value);document.getElementById('vl-zoom').textContent=this.value+'%'">
+              </div>
+              <div class="sl-val" id="vl-zoom">100%</div>
+            </div>
+            <div class="sl-row">
+              <div>
+                <div class="sl-label">좌우 위치</div>
+                <input type="range" id="sl-posx" min="0" max="100" value="50" oninput="onSl('imgPosX',this.value);document.getElementById('vl-posx').textContent=this.value+'%'">
+              </div>
+              <div class="sl-val" id="vl-posx">50%</div>
+            </div>
+            <div class="sl-row">
+              <div>
+                <div class="sl-label">상하 위치</div>
+                <input type="range" id="sl-posy" min="0" max="100" value="50" oninput="onSl('imgPosY',this.value);document.getElementById('vl-posy').textContent=this.value+'%'">
+              </div>
+              <div class="sl-val" id="vl-posy">50%</div>
+            </div>
+            <div id="overlay-section">
+              <div class="sl-row">
+                <div>
+                  <div class="sl-label">배경 선명도 (어둡게)</div>
+                  <input type="range" id="sl-overlay" min="0" max="90" value="60" oninput="onSl('overlayOp',this.value);document.getElementById('vl-overlay').textContent=this.value+'%'">
+                </div>
+                <div class="sl-val" id="vl-overlay">60%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 텍스트 섹션 -->
+      <div class="sec">
+        <div class="sec-header open" onclick="toggleSec(this)">
+          <span class="sec-title-txt">✏️ 텍스트 스타일</span>
+          <span class="sec-arrow">▼</span>
+        </div>
+        <div class="sec-body open">
+          <div class="st">폰트 선택</div>
+          <div class="font-select">
+            <div class="font-opt active" id="font-noto" onclick="setFont('Noto Sans KR')">
+              <div class="fo-name" style="font-family:'Noto Sans KR'">기본 고딕</div>
+              <div class="fo-sample" style="font-family:'Noto Sans KR'">Noto Sans KR</div>
+            </div>
+            <div class="font-opt" id="font-serif" onclick="setFont('Noto Serif KR')">
+              <div class="fo-name" style="font-family:'Noto Serif KR'">명조체</div>
+              <div class="fo-sample" style="font-family:'Noto Serif KR'">Noto Serif KR</div>
+            </div>
+            <div class="font-opt" id="font-black" onclick="setFont('Black Han Sans')">
+              <div class="fo-name" style="font-family:'Black Han Sans'">강조 고딕</div>
+              <div class="fo-sample" style="font-family:'Black Han Sans'">Black Han</div>
+            </div>
+            <div class="font-opt" id="font-sun" onclick="setFont('Sunflower')">
+              <div class="fo-name" style="font-family:'Sunflower';font-weight:700">감성체</div>
+              <div class="fo-sample" style="font-family:'Sunflower'">Sunflower</div>
+            </div>
+          </div>
+
+          <div class="sl-row" style="margin-top:10px;">
+            <div>
+              <div class="sl-label">제목 크기</div>
+              <input type="range" id="sl-title-sz" min="60" max="160" value="100" oninput="onSl('titleScale',this.value);document.getElementById('vl-title-sz').textContent=this.value+'%'">
+            </div>
+            <div class="sl-val" id="vl-title-sz">100%</div>
+          </div>
+          <div class="sl-row">
+            <div>
+              <div class="sl-label">본문 크기</div>
+              <input type="range" id="sl-body-sz" min="60" max="150" value="100" oninput="onSl('bodyScale',this.value);document.getElementById('vl-body-sz').textContent=this.value+'%'">
+            </div>
+            <div class="sl-val" id="vl-body-sz">100%</div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="st">글자 위치 조정</div>
+          <div class="sl-row">
+            <div>
+              <div class="sl-label">가로 (좌↔우)</div>
+              <input type="range" id="sl-tx" min="-80" max="80" value="0" oninput="onSl('textOffsetX',this.value);document.getElementById('vl-tx').textContent=this.value+'px'">
+            </div>
+            <div class="sl-val" id="vl-tx">0px</div>
+          </div>
+          <div class="sl-row">
+            <div>
+              <div class="sl-label">세로 (위↕아래)</div>
+              <input type="range" id="sl-ty" min="-80" max="80" value="0" oninput="onSl('textOffsetY',this.value);document.getElementById('vl-ty').textContent=this.value+'px'">
+            </div>
+            <div class="sl-val" id="vl-ty">0px</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-style -->
+  </div><!-- /panel -->
+
+  <!-- ══ PREVIEW ══ -->
+  <div class="prev">
+    <div class="prev-top">
+      <span class="card-counter" id="counter">카드 미생성</span>
+      <div class="pacts">
+        <button class="ab s" onclick="downloadCurrentCard()">⬇ 현재 카드</button>
+        <button class="ab" onclick="downloadAllCards()">📦 전체 저장</button>
+      </div>
+    </div>
+    <div class="card-frame" id="card-frame">
+      <div class="ci ph" style="background:var(--cream);">
+        <div style="font-size:44px;margin-bottom:14px;opacity:.3;">🐾</div>
+        <p style="font-size:13px;color:var(--bm);line-height:1.7;word-break:keep-all;text-align:center;">
+          내용 입력 탭에서 텍스트를 작성하고<br><strong>카드뉴스 생성하기</strong>를 눌러주세요.<br><br>
+          생성 후 <strong>카드 스타일 탭</strong>에서<br>이미지·폰트·위치를 카드별로 조정할 수 있어요.
+        </p>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>‹</button>
+      <div class="dots" id="dots"></div>
+      <button class="nav-btn" id="btn-next" onclick="navigate(1)" disabled>›</button>
+    </div>
+  </div>
+
+</div>
+<div class="dlp" id="dlp">⏳ 저장 중...</div>
+
+<script>
+// ══ STATE ══
+let mode = 'product';
+let cards = [];
+let curIdx = 0;
+
+const FONT_DEFAULTS = { 'Noto Sans KR':900, 'Noto Serif KR':900, 'Black Han Sans':400, 'Sunflower':700 };
+
+const DEFAULT_STATE = () => ({
+  image: null,
+  imgStyle: 'none',
+  imgZoom: 100,
+  imgPosX: 50,
+  imgPosY: 50,
+  overlayOp: 60,
+  fontFamily: 'Noto Sans KR',
+  titleScale: 100,
+  bodyScale: 100,
+  textOffsetX: 0,
+  textOffsetY: 0,
+});
+
+const cardState = {};
+function gs(idx) {
+  if (!cardState[idx]) cardState[idx] = DEFAULT_STATE();
+  return cardState[idx];
+}
+
+const CARD_META = {
+  product: [
+    {num:'01',label:'표지 카드',sub:'제품명 · 슬로건'},
+    {num:'02',label:'추천 대상',sub:'이런 분께 추천'},
+    {num:'03',label:'기능 카드 1',sub:'핵심 기능 첫 번째'},
+    {num:'04',label:'기능 카드 2',sub:'핵심 기능 두 번째'},
+    {num:'05',label:'기능 카드 3',sub:'핵심 기능 세 번째'},
+    {num:'06',label:'소재·스펙',sub:'소재 & 상세 스펙'},
+    {num:'07',label:'요약 카드',sub:'핵심 3가지 요약'},
+    {num:'08',label:'CTA 카드',sub:'구매 유도 · 팔로우'},
+  ],
+  info: [
+    {num:'01',label:'표지 카드',sub:'주제 · 서브카피'},
+    {num:'02',label:'목차 카드',sub:'오늘의 내용'},
+    {num:'03',label:'팁 카드 1',sub:'첫 번째 팁'},
+    {num:'04',label:'팁 카드 2',sub:'두 번째 팁'},
+    {num:'05',label:'팁 카드 3',sub:'세 번째 팁'},
+    {num:'06',label:'주의사항',sub:'꼭 알아두세요'},
+    {num:'07',label:'CTA 카드',sub:'팔로우 · 공유 유도'},
+  ]
+};
+
+// ══ TABS ══
+function switchTab(t) {
+  document.getElementById('tab-content').style.display = t==='content'?'block':'none';
+  document.getElementById('tab-style').style.display   = t==='style'  ?'block':'none';
+  document.getElementById('tab-content-btn').classList.toggle('active', t==='content');
+  document.getElementById('tab-style-btn').classList.toggle('active', t==='style');
+  if (t==='style' && cards.length) updateStylePanel(curIdx);
+}
+
+// ══ MODE ══
+function setMode(m) {
+  mode = m;
+  document.getElementById('form-product').style.display = m==='product'?'flex':'none';
+  document.getElementById('form-info').style.display    = m==='info'   ?'flex':'none';
+  document.getElementById('btn-product').classList.toggle('active', m==='product');
+  document.getElementById('btn-info').classList.toggle('active', m==='info');
+}
+
+// ══ SECTION COLLAPSE ══
+function toggleSec(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+
+// ══ STYLE PANEL ══
+function updateStylePanel(idx) {
+  const s = gs(idx);
+  const meta = CARD_META[mode];
+  if (!meta[idx]) return;
+  document.getElementById('scs-num').textContent = meta[idx].num;
+  document.getElementById('scs-name').textContent = meta[idx].label;
+  document.getElementById('scs-sub').textContent = meta[idx].sub;
+  document.getElementById('scs-prev').disabled = idx === 0;
+  document.getElementById('scs-next').disabled = idx === meta.length - 1;
+
+  // Image
+  const thumb = document.getElementById('st-thumb');
+  const ph = document.getElementById('st-upload-ph');
+  const rmBtn = document.getElementById('st-remove-btn');
+  if (s.image) {
+    thumb.src = s.image; thumb.style.display='block';
+    ph.style.display='none'; rmBtn.style.display='block';
+  } else {
+    thumb.style.display='none'; ph.style.display='block'; rmBtn.style.display='none';
+  }
+
+  // Image style buttons
+  ['none','top','side','bg'].forEach(x => document.getElementById('is-'+x).classList.toggle('active', x===s.imgStyle));
+
+  // Overlay section visibility
+  document.getElementById('overlay-section').style.display = s.imgStyle==='bg'?'block':'none';
+
+  // Sliders
+  setSlider('sl-zoom', 'vl-zoom', s.imgZoom, '%');
+  setSlider('sl-posx', 'vl-posx', s.imgPosX, '%');
+  setSlider('sl-posy', 'vl-posy', s.imgPosY, '%');
+  setSlider('sl-overlay', 'vl-overlay', s.overlayOp, '%');
+  setSlider('sl-title-sz', 'vl-title-sz', s.titleScale, '%');
+  setSlider('sl-body-sz', 'vl-body-sz', s.bodyScale, '%');
+  setSlider('sl-tx', 'vl-tx', s.textOffsetX, 'px');
+  setSlider('sl-ty', 'vl-ty', s.textOffsetY, 'px');
+
+  // Font buttons
+  const fonts = ['Noto Sans KR','Noto Serif KR','Black Han Sans','Sunflower'];
+  const ids = ['noto','serif','black','sun'];
+  fonts.forEach((f,i) => document.getElementById('font-'+ids[i]).classList.toggle('active', f===s.fontFamily));
+}
+
+function setSlider(slId, vlId, val, unit) {
+  document.getElementById(slId).value = val;
+  document.getElementById(vlId).textContent = val + unit;
+}
+
+function styleNav(dir) {
+  const n = curIdx + dir;
+  const meta = CARD_META[mode];
+  if (n >= 0 && n < meta.length) { navigate(dir); }
+}
+
+// ══ STYLE CONTROLS ══
+function onSl(key, val) {
+  gs(curIdx)[key] = parseFloat(val);
+  if (key === 'imgStyle') {
+    document.getElementById('overlay-section').style.display = val==='bg'?'block':'none';
+  }
+  rerenderCurrent();
+}
+
+function setCardImgStyle(style) {
+  gs(curIdx).imgStyle = style;
+  ['none','top','side','bg'].forEach(x => document.getElementById('is-'+x).classList.toggle('active', x===style));
+  document.getElementById('overlay-section').style.display = style==='bg'?'block':'none';
+  rerenderCurrent();
+}
+
+function setFont(f) {
+  gs(curIdx).fontFamily = f;
+  const fonts = ['Noto Sans KR','Noto Serif KR','Black Han Sans','Sunflower'];
+  const ids = ['noto','serif','black','sun'];
+  fonts.forEach((fn,i) => document.getElementById('font-'+ids[i]).classList.toggle('active', fn===f));
+  rerenderCurrent();
+}
+
+// ══ IMAGE UPLOAD (STYLE TAB) ══
+function stHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('st-upload-area').style.borderColor='';
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadCardImg(curIdx, f);
+}
+function stHandleImg(e) {
+  const f = e.target.files[0]; if (f) loadCardImg(curIdx, f);
+}
+function loadCardImg(idx, file) {
+  const r = new FileReader();
+  r.onload = ev => {
+    gs(idx).image = ev.target.result;
+    if (gs(idx).imgStyle === 'none') { gs(idx).imgStyle = 'top'; }
+    updateStylePanel(idx);
+    rerenderCurrent();
+    document.getElementById('st-file-input').value = '';
+  };
+  r.readAsDataURL(file);
+}
+function stRemoveImg() {
+  gs(curIdx).image = null;
+  gs(curIdx).imgStyle = 'none';
+  updateStylePanel(curIdx);
+  rerenderCurrent();
+}
+
+// ══ HELPERS ══
+function v(id) { const e=document.getElementById(id); return e?e.value.trim():''; }
+function fs(base, scale) { return `${(base * scale / 100).toFixed(1)}px`; }
+
+function imgCSS(s) {
+  return `width:100%;height:100%;object-fit:cover;display:block;` +
+    `object-position:${s.imgPosX}% ${s.imgPosY}%;` +
+    `transform:scale(${s.imgZoom/100});transform-origin:${s.imgPosX}% ${s.imgPosY}%;`;
+}
+
+function textWrap(content, s, extra='') {
+  const ff = s.fontFamily;
+  return `<div style="transform:translate(${s.textOffsetX}px,${s.textOffsetY}px);font-family:'${ff}',sans-serif;display:flex;flex-direction:column;flex:1;${extra}">${content}</div>`;
+}
+
+// ══ CARD BUILDERS ══
+function buildCover(idx, icon, name, tagline, total) {
+  const s = gs(idx);
+  const ts = `font-size:${fs(24,s.titleScale)};font-weight:900;color:var(--bd);line-height:1.3;margin-bottom:9px;word-break:keep-all;`;
+  const ss = `font-size:${fs(12,s.bodyScale)};color:var(--bm);line-height:1.6;word-break:keep-all;font-family:'${s.fontFamily}',sans-serif;`;
+  const badge = `<div class="bt" style="font-family:'${s.fontFamily}',sans-serif;">PETSLAND</div>`;
+  const badgeL = `<div class="bt l" style="font-family:'${s.fontFamily}',sans-serif;">PETSLAND</div>`;
+  const icon_el = `<div style="font-size:${fs(44,s.titleScale)};margin-bottom:10px;">${icon}</div>`;
+  const title_el = `<div style="${ts}font-family:'${s.fontFamily}',sans-serif;">${name}</div>`;
+  const sub_el = `<div style="${ss}">${tagline}</div>`;
+  const paw = `<div class="cpaw">🐾 🐾 🐾</div>`;
+  const num = `<div class="cnum-badge">01 / ${total}</div>`;
+
+  if (!s.image || s.imgStyle==='none') {
+    return `<div class="ci cc" style="padding:36px;">
+      <div class="cd"></div><div class="cdbl"></div>
+      ${textWrap(`${badge}${icon_el}${title_el}${sub_el}`, s, 'align-items:center;justify-content:center;text-align:center;')}
+      ${paw}${num}
+    </div>`;
+  }
+  if (s.imgStyle==='bg') {
+    const ov = s.overlayOp/100;
+    return `<div class="ci cc" style="padding:36px;position:relative;">
+      <img src="${s.image}" style="position:absolute;inset:0;z-index:0;${imgCSS(s)}">
+      <div style="position:absolute;inset:0;background:rgba(44,24,16,${ov});z-index:1;"></div>
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transform:translate(${s.textOffsetX}px,${s.textOffsetY}px);font-family:'${s.fontFamily}',sans-serif;">
+        ${badgeL}
+        <div style="font-size:${fs(44,s.titleScale)};margin-bottom:10px;">${icon}</div>
+        <div style="${ts}color:var(--cream);">${name}</div>
+        <div style="font-size:${fs(12,s.bodyScale)};color:rgba(255,249,244,.8);line-height:1.6;word-break:keep-all;">${tagline}</div>
+      </div>
+      <div class="cnum-badge l">01 / ${total}</div>
+    </div>`;
+  }
+  // top / side → split
+  return `<div class="ci cc" style="padding:0;background:var(--cream);display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;">
+    <div style="flex:1;overflow:hidden;position:relative;">
+      <img src="${s.image}" style="position:absolute;inset:0;${imgCSS(s)}">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(44,24,16,.4) 100%);"></div>
+      <div style="position:absolute;top:12px;left:14px;">${badge}</div>
+    </div>
+    <div style="padding:16px 24px 20px;text-align:center;background:var(--cream);">
+      ${textWrap(`<div style="font-size:${fs(44,s.titleScale)};margin-bottom:6px;">${icon}</div>${title_el}${sub_el}`, s, 'align-items:center;')}
+    </div>
+    ${num}
+  </div>`;
+}
+
+function buildFeature(idx, pageNum, featNum, total, icon, title, desc, tip, prefix) {
+  const s = gs(idx);
+  const numTxt = `${prefix} ${String(featNum).padStart(2,'0')}`;
+  const ff = `font-family:'${s.fontFamily}',sans-serif;`;
+  const titleEl = `<div class="fit"><span style="font-size:${fs(26,s.titleScale)}">${icon}</span>
+    <div style="font-size:${fs(18,s.titleScale)};font-weight:900;color:var(--bd);line-height:1.3;word-break:keep-all;${ff}">${title}</div></div>`;
+  const descEl = `<div style="font-size:${fs(13,s.bodyScale)};color:var(--bd);line-height:1.7;word-break:keep-all;${ff}">${desc||'기능 설명을 입력해주세요.'}</div>`;
+  const tipEl = tip ? `<div class="fhi" style="font-size:${fs(11,s.bodyScale)};${ff}">💡 ${tip}</div>` : '';
+  const footEl = `<div class="cfoot"><span class="bm-txt">PETSLAND</span><span class="pm-txt">${pageNum} / ${total}</span></div>`;
+
+  if (!s.image || s.imgStyle==='none') {
+    return `<div class="ci cf">
+      <div class="fh" style="padding:19px 24px 15px;">
+        <div class="fnm" style="${ff}">${numTxt}</div>${titleEl}
+      </div>
+      ${textWrap(`<div class="fb" style="padding:24px 24px 14px;gap:10px;">${descEl}${tipEl}</div>${footEl}`, s)}
+    </div>`;
+  }
+  if (s.imgStyle==='side') {
+    return `<div class="ci cf" style="flex-direction:row;">
+      <div style="width:42%;overflow:hidden;position:relative;flex-shrink:0;">
+        <img src="${s.image}" style="position:absolute;inset:0;${imgCSS(s)}">
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="fh" style="padding:13px 14px 10px;">
+          <div class="fnm" style="${ff}">${numTxt}</div>
+          <div class="fit"><span style="font-size:${fs(20,s.titleScale)}">${icon}</span>
+            <div style="font-size:${fs(14,s.titleScale)};font-weight:900;color:var(--bd);line-height:1.3;word-break:keep-all;${ff}">${title}</div></div>
+        </div>
+        ${textWrap(`<div class="fb cmp" style="padding:14px 14px 10px;gap:8px;">
+          <div style="font-size:${fs(11,s.bodyScale)};color:var(--bd);line-height:1.65;word-break:keep-all;${ff}">${desc||'기능 설명 입력'}</div>
+          ${tip?`<div class="fhi" style="font-size:${fs(10,s.bodyScale)};${ff}">💡 ${tip}</div>`:''}
+        </div>${footEl}`, s)}
+      </div>
+    </div>`;
+  }
+  if (s.imgStyle==='bg') {
+    const ov = s.overlayOp/100;
+    return `<div class="ci cf" style="position:relative;">
+      <img src="${s.image}" style="position:absolute;inset:0;z-index:0;${imgCSS(s)}">
+      <div style="position:absolute;inset:0;background:rgba(255,249,244,${ov > 0.5 ? ov : 0.88});z-index:1;"></div>
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:100%;">
+        <div class="fh" style="padding:19px 24px 15px;background:rgba(242,224,203,0.9);">
+          <div class="fnm" style="${ff}">${numTxt}</div>${titleEl}
+        </div>
+        ${textWrap(`<div class="fb" style="padding:24px 24px 14px;gap:10px;">${descEl}${tipEl}</div>${footEl}`, s)}
+      </div>
+    </div>`;
+  }
+  // top banner
+  return `<div class="ci cf">
+    <div style="height:170px;overflow:hidden;position:relative;flex-shrink:0;">
+      <img src="${s.image}" style="position:absolute;inset:0;${imgCSS(s)}">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(255,249,244,.85) 100%);"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div class="fh" style="padding:12px 22px 9px;">
+        <div class="fnm" style="${ff}">${numTxt}</div>
+        <div class="fit"><span style="font-size:${fs(20,s.titleScale)}">${icon}</span>
+          <div style="font-size:${fs(15,s.titleScale)};font-weight:900;color:var(--bd);line-height:1.3;word-break:keep-all;${ff}">${title}</div></div>
+      </div>
+      ${textWrap(`<div class="fb cmp" style="padding:12px 22px 8px;gap:8px;">
+        <div style="font-size:${fs(11.5,s.bodyScale)};color:var(--bd);line-height:1.65;word-break:keep-all;${ff}">${desc||'기능 설명 입력'}</div>
+        ${tip?`<div class="fhi" style="font-size:${fs(10,s.bodyScale)};${ff}">💡 ${tip}</div>`:''}
+      </div>${footEl}`, s)}
+    </div>
+  </div>`;
+}
+
+function buildTarget(idx, pageNum, total, t1i,t1, t2i,t2, t3i,t3) {
+  const s = gs(idx);
+  const ff = `font-family:'${s.fontFamily}',sans-serif;`;
+  const items = (gap='9px',iconSz='22px',txtSz=12,pad='11px 13px') => `
+    <div class="titem" style="gap:10px;padding:${pad};margin-bottom:${gap};"><span style="font-size:${iconSz}">${t1i||'🐾'}</span>
+      <div style="font-size:${fs(txtSz,s.bodyScale)};font-weight:600;color:var(--bd);line-height:1.45;word-break:keep-all;${ff}">${t1||'추천 상황 1'}</div></div>
+    <div class="titem" style="gap:10px;padding:${pad};margin-bottom:${gap};"><span style="font-size:${iconSz}">${t2i||'🌿'}</span>
+      <div style="font-size:${fs(txtSz,s.bodyScale)};font-weight:600;color:var(--bd);line-height:1.45;word-break:keep-all;${ff}">${t2||'추천 상황 2'}</div></div>
+    <div class="titem" style="gap:10px;padding:${pad};"><span style="font-size:${iconSz}">${t3i||'☀️'}</span>
+      <div style="font-size:${fs(txtSz,s.bodyScale)};font-weight:600;color:var(--bd);line-height:1.45;word-break:keep-all;${ff}">${t3||'추천 상황 3'}</div></div>`;
+
+  const foot = `<div class="cfoot"><span class="bm-txt">PETSLAND</span><span class="pm-txt">${pageNum} / ${total}</span></div>`;
+
+  if (!s.image || s.imgStyle==='none') {
+    return `<div class="ci ct" style="padding:26px 24px;">
+      ${textWrap(`
+        <div class="ttag" style="${ff}">For Who · 추천 대상</div>
+        <div style="font-size:${fs(18,s.titleScale)};font-weight:900;color:var(--bd);margin-bottom:14px;line-height:1.35;word-break:keep-all;${ff}">이런 반려견에게<br>꼭 맞아요 🎯</div>
+        <div class="titems" style="gap:0;">${items()}</div>
+      `, s)}
+      ${foot}
+    </div>`;
+  }
+  if (s.imgStyle==='side') {
+    return `<div class="ci ct" style="padding:0;flex-direction:row;display:flex;">
+      <div style="width:40%;overflow:hidden;position:relative;flex-shrink:0;"><img src="${s.image}" style="position:absolute;inset:0;${imgCSS(s)}"></div>
+      <div style="flex:1;padding:18px 14px;display:flex;flex-direction:column;">
+        ${textWrap(`
+          <div class="ttag" style="${ff}">추천 대상</div>
+          <div style="font-size:${fs(15,s.titleScale)};font-weight:900;color:var(--bd);margin-bottom:10px;line-height:1.35;word-break:keep-all;${ff}">꼭 맞아요 🎯</div>
+          <div class="titems">${items('7px','18px',11,'9px 11px')}</div>
+        `, s)}
+        ${foot}
+      </div>
+    </div>`;
+  }
+  const ov = s.overlayOp/100;
+  if (s.imgStyle==='bg') {
+    return `<div class="ci ct" style="padding:26px 24px;position:relative;">
+      <img src="${s.image}" style="position:absolute;inset:0;z-index:0;${imgCSS(s)}">
+      <div style="position:absolute;inset:0;background:rgba(255,249,244,${ov>0.5?ov:0.86});z-index:1;"></div>
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:100%;">
+        ${textWrap(`
+          <div class="ttag" style="${ff}">For Who · 추천 대상</div>
+          <div style="font-size:${fs(18,s.titleScale)};font-weight:900;color:var(--bd);margin-bottom:14px;line-height:1.35;word-break:keep-all;${ff}">이런 반려견에게<br>꼭 맞아요 🎯</div>
+          <div class="titems">${items()}</div>
+        `, s)}
+        ${foot}
+      </div>
+    </div>`;
+  }
+  // top
+  return `<div class="ci ct" style="padding:0;display:flex;flex-direction:column;">
+    <div style="height:155px;overflow:hidden;position:relative;flex-shrink:0;"><img src="${s.image}" style="position:absolute;inset:0;${imgCSS(s)}"></div>
+    <div style="padding:15px 22px;flex:1;display:flex;flex-direction:column;">
+      ${textWrap(`
+        <div class="ttag" style="${ff}">For Who · 추천 대상</div>
+        <div style="font-size:${fs(14,s.titleScale)};font-weight:900;color:var(--bd);margin-bottom:9px;line-height:1.35;word-break:keep-all;${ff}">꼭 맞아요 🎯</div>
+        <div class="titems">${items('6px','18px',11,'8px 11px')}</div>
+      `, s)}
+    </div>
+    ${foot}
+  </div>`;
+}
+
+function buildDetail(idx, pageNum, total, s1,s2,s3,s4,s5) {
+  const st = gs(idx);
+  const ff = `font-family:'${st.fontFamily}',sans-serif;`;
+  const rowData = [{l:'겉감',v:s1||'소재 정보 입력'},{l:'안감',v:s2||'안감 정보 입력'},{l:'부자재',v:s3||'부자재 정보'},{l:'사이즈',v:s4||'사이즈 정보'},...(s5?[{l:'특이',v:s5}]:[])];
+  const rows = (pad='9px 11px',lblW='44px') => rowData.map(r=>`<div class="drow" style="padding:${pad};gap:8px;margin-bottom:5px;"><span class="dlbl" style="min-width:${lblW};${ff}">${r.l}</span><span class="dval" style="font-size:${fs(11,st.bodyScale)};${ff}">${r.v}</span></div>`).join('');
+  const foot = `<div class="cfoot" style="margin-top:6px;padding-top:8px;border-top:1px solid rgba(139,111,94,.2);"><span class="bm-txt">PETSLAND</span><span class="pm-txt">${pageNum} / ${total}</span></div>`;
+
+  if (!st.image || st.imgStyle==='none') {
+    return `<div class="ci cd-c" style="padding:26px 24px;position:relative;">
+      <div class="dcirc"></div>
+      ${textWrap(`
+        <div class="dtag" style="${ff}">Materials & Spec · 소재 & 스펙</div>
+        <div style="font-size:${fs(18,st.titleScale)};font-weight:900;color:var(--bd);margin-bottom:12px;line-height:1.35;word-break:keep-all;${ff}">믿을 수 있는 소재,<br>꼼꼼한 마감 🧵</div>
+        <div class="ditems">${rows()}</div>
+      `, st)}
+      ${foot}
+    </div>`;
+  }
+  if (st.imgStyle==='side') {
+    return `<div class="ci cd-c" style="padding:0;flex-direction:row;display:flex;">
+      <div style="width:40%;overflow:hidden;position:relative;flex-shrink:0;"><img src="${st.image}" style="position:absolute;inset:0;${imgCSS(st)}"></div>
+      <div style="flex:1;padding:18px 14px;display:flex;flex-direction:column;background:var(--sand);">
+        ${textWrap(`
+          <div class="dtag" style="font-size:8px;${ff}">소재 & 스펙</div>
+          <div style="font-size:${fs(14,st.titleScale)};font-weight:900;color:var(--bd);margin-bottom:10px;line-height:1.35;word-break:keep-all;${ff}">꼼꼼한 마감 🧵</div>
+          <div class="ditems">${rows('7px 9px','36px')}</div>
+        `, st)}
+        ${foot}
+      </div>
+    </div>`;
+  }
+  const ov = st.overlayOp/100;
+  if (st.imgStyle==='bg') {
+    return `<div class="ci cd-c" style="padding:26px 24px;position:relative;">
+      <img src="${st.image}" style="position:absolute;inset:0;z-index:0;${imgCSS(st)}">
+      <div style="position:absolute;inset:0;background:rgba(245,239,232,${ov>0.5?ov:0.9});z-index:1;"></div>
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:100%;">
+        ${textWrap(`
+          <div class="dtag" style="${ff}">소재 & 스펙</div>
+          <div style="font-size:${fs(18,st.titleScale)};font-weight:900;color:var(--bd);margin-bottom:12px;line-height:1.35;word-break:keep-all;${ff}">믿을 수 있는 소재,<br>꼼꼼한 마감 🧵</div>
+          <div class="ditems">${rows()}</div>
+        `, st)}
+        ${foot}
+      </div>
+    </div>`;
+  }
+  return `<div class="ci cd-c" style="padding:0;display:flex;flex-direction:column;background:var(--sand);">
+    <div style="height:162px;overflow:hidden;position:relative;flex-shrink:0;"><img src="${st.image}" style="position:absolute;inset:0;${imgCSS(st)}"></div>
+    <div style="padding:14px 22px;flex:1;display:flex;flex-direction:column;">
+      ${textWrap(`
+        <div class="dtag" style="${ff}">소재 & 스펙</div>
+        <div class="ditems">${rows('7px 9px','36px')}</div>
+      `, st)}
+    </div>
+    ${foot}
+  </div>`;
+}
+
+function buildCTA(idx, pageNum, total, ctaTitle, ctaSub, ctaLink) {
+  const s = gs(idx);
+  const ff = `font-family:'${s.fontFamily}',sans-serif;`;
+  const inner = `
+    <div style="font-size:${fs(38,s.titleScale)};margin-bottom:11px;">🐾</div>
+    <div style="font-size:${fs(21,s.titleScale)};font-weight:900;color:var(--cream);line-height:1.35;margin-bottom:8px;word-break:keep-all;${ff}">${ctaTitle||'지금 펫츠랜드에서\n만나보세요'}</div>
+    <div style="font-size:${fs(12,s.bodyScale)};color:rgba(255,249,244,.7);line-height:1.6;margin-bottom:18px;word-break:keep-all;${ff}">${ctaSub||'우리 아이를 위한 프리미엄 선택'}</div>
+    <div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap;">
+      <span style="background:var(--gold);border-radius:16px;padding:6px 13px;font-size:${fs(11,s.bodyScale)};font-weight:700;color:var(--bd);${ff}">${ctaLink||'프로필 링크 방문'}</span>
+      <span style="background:rgba(255,249,244,.12);border:1px solid rgba(255,249,244,.25);color:var(--cream);border-radius:16px;padding:6px 13px;font-size:${fs(11,s.bodyScale)};font-weight:700;${ff}">@petsland_official</span>
+    </div>
+    <div style="margin-top:16px;font-size:${fs(10,s.bodyScale)};color:var(--gold);font-weight:700;letter-spacing:.14em;text-transform:uppercase;${ff}">PETSLAND × PREMIUM PET LIFESTYLE</div>`;
+
+  if (!s.image || s.imgStyle==='none') {
+    return `<div class="ci cta-c" style="padding:36px;">
+      <div class="bgd1"></div><div class="bgd2"></div>
+      ${textWrap(inner, s, 'align-items:center;position:relative;z-index:2;')}
+    </div>`;
+  }
+  const ov = s.overlayOp/100;
+  return `<div class="ci cta-c" style="padding:36px;position:relative;">
+    <img src="${s.image}" style="position:absolute;inset:0;z-index:0;${imgCSS(s)}">
+    <div style="position:absolute;inset:0;background:rgba(44,24,16,${ov>0.3?ov:0.72});z-index:1;"></div>
+    ${textWrap(inner, s, 'align-items:center;position:relative;z-index:2;')}
+  </div>`;
+}
+
+// ══ GENERATE ══
+function generateCards() {
+  cards = mode==='product' ? buildProductCards() : buildInfoCards();
+  curIdx = 0;
+  renderDots();
+  showCard(0);
+  if (document.getElementById('tab-style').style.display !== 'none') updateStylePanel(0);
+}
+
+function rerenderCurrent() {
+  if (!cards.length) return;
+  const html = buildCardByIdx(curIdx);
+  cards[curIdx] = html;
+  document.getElementById('card-frame').innerHTML = html;
+}
+
+function buildCardByIdx(idx) {
+  if (mode === 'product') return buildProductCards()[idx];
+  return buildInfoCards()[idx];
+}
+
+function buildProductCards() {
+  const name=v('p-name')||'신제품', tag=v('p-tagline')||'반려견과 함께하는 프리미엄 라이프스타일', ico=v('p-icon')||'🐾', T=8;
+  return [
+    buildCover(0,ico,name,tag,T),
+    buildTarget(1,2,T,v('p-t1-icon'),v('p-t1'),v('p-t2-icon'),v('p-t2'),v('p-t3-icon'),v('p-t3')),
+    buildFeature(2,3,1,T,v('p-f1-icon')||'⭐',v('p-f1-title')||'핵심 기능 1',v('p-f1-desc'),v('p-f1-tip'),'Feature'),
+    buildFeature(3,4,2,T,v('p-f2-icon')||'⭐',v('p-f2-title')||'핵심 기능 2',v('p-f2-desc'),v('p-f2-tip'),'Feature'),
+    buildFeature(4,5,3,T,v('p-f3-icon')||'⭐',v('p-f3-title')||'핵심 기능 3',v('p-f3-desc'),v('p-f3-tip'),'Feature'),
+    buildDetail(5,6,T,v('p-s1'),v('p-s2'),v('p-s3'),v('p-s4'),v('p-s5')),
+    (() => {
+      const s=gs(6); const ff=`font-family:'${s.fontFamily}',sans-serif;`;
+      return `<div class="ci cs" style="padding:26px 24px;">
+        ${textWrap(`
+          <div class="stag" style="${ff}">Summary · 한눈에 보기</div>
+          <div style="font-size:${fs(19,s.titleScale)};font-weight:900;color:var(--bd);margin-bottom:14px;line-height:1.35;word-break:keep-all;${ff}">${name}<br>3가지 핵심 ✨</div>
+          <div class="slist" style="gap:0;">
+            ${[1,2,3].map(n=>`<div class="sitem" style="gap:8px;margin-bottom:11px;"><div class="sdot">${n}</div>
+              <div style="font-size:${fs(12,s.bodyScale)};color:var(--bd);line-height:1.6;font-weight:500;word-break:keep-all;${ff}">
+                ${v('p-f'+n+'-title')||'핵심 기능 '+n} — ${(v('p-f'+n+'-desc')||'설명').substring(0,40)}${v('p-f'+n+'-desc').length>40?'…':''}
+              </div></div>`).join('')}
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,111,94,.2);font-size:${fs(11,s.bodyScale)};color:var(--bm);font-style:italic;word-break:keep-all;${ff}">프리미엄 라이프스타일 × 반려견 안전 — PETSLAND</div>
+        `, s)}
+        <div class="cfoot"><span class="bm-txt">PETSLAND</span><span class="pm-txt">7 / 8</span></div>
+      </div>`;
+    })(),
+    buildCTA(7,8,T,v('p-cta-title'),v('p-cta-sub'),v('p-cta-link')),
+  ];
+}
+
+function buildInfoCards() {
+  const title=v('i-title')||'반려동물 케어 팁', sub=v('i-sub')||'우리 아이를 위한 유용한 정보', ico=v('i-icon')||'🐶', T=7;
+  return [
+    buildCover(0,ico,title,sub,T),
+    (() => {
+      const s=gs(1); const ff=`font-family:'${s.fontFamily}',sans-serif;`;
+      return `<div class="ci ci-in">
+        <div class="itag" style="${ff}">Contents · 오늘의 내용</div>
+        ${textWrap(`
+          <div style="font-size:${fs(19,s.titleScale)};font-weight:900;color:var(--cream);line-height:1.35;margin-bottom:18px;word-break:keep-all;${ff}">이 카드에서<br>알려드릴 내용이에요 📋</div>
+          <div class="iitems">${[1,2,3].map(n=>`<div class="iitem"><span class="inum">0${n}</span>
+            <span class="itxt" style="font-size:${fs(11.5,s.bodyScale)};${ff}">${v('i-f'+n+'-title')||'팁 '+n}</span></div>`).join('')}</div>
+        `, s)}
+        <div class="ifooter" style="${ff}">PETSLAND · 반려동물 케어 가이드</div>
+      </div>`;
+    })(),
+    buildFeature(2,3,1,T,v('i-f1-icon')||'⭐',v('i-f1-title')||'팁 1',v('i-f1-desc'),v('i-f1-tip'),'Tip'),
+    buildFeature(3,4,2,T,v('i-f2-icon')||'⭐',v('i-f2-title')||'팁 2',v('i-f2-desc'),v('i-f2-tip'),'Tip'),
+    buildFeature(4,5,3,T,v('i-f3-icon')||'⭐',v('i-f3-title')||'팁 3',v('i-f3-desc'),v('i-f3-tip'),'Tip'),
+    (() => {
+      const s=gs(5); const ff=`font-family:'${s.fontFamily}',sans-serif;`;
+      return `<div class="ci cau-c" style="padding:26px 24px;">
+        ${textWrap(`
+          <div class="cautag" style="${ff}">Caution · 이것만은 주의!</div>
+          <div style="font-size:${fs(19,s.titleScale)};font-weight:900;color:var(--bd);margin-bottom:16px;line-height:1.35;word-break:keep-all;${ff}">꼭 알아두세요 ⚠️</div>
+          <div class="cauitems" style="gap:0;">
+            ${[1,2,3].map(n=>`<div class="cauitem" style="padding:10px 11px;margin-bottom:9px;">
+              <span style="font-size:14px;margin-top:1px;">${v('i-c'+n+'-icon')||['❌','⚠️','🚫'][n-1]}</span>
+              <span style="font-size:${fs(12,s.bodyScale)};color:var(--bd);font-weight:500;line-height:1.6;word-break:keep-all;${ff}">${v('i-c'+n)||'주의사항 '+n+' 입력'}</span>
+            </div>`).join('')}
+          </div>
+        `, s)}
+        <div class="cfoot" style="border-color:rgba(61,107,65,.2);"><span class="bm-txt" style="color:#3D6B41;">PETSLAND CARE</span><span class="pm-txt">6 / 7</span></div>
+      </div>`;
+    })(),
+    buildCTA(6,7,T,v('i-cta-title'),v('i-cta-sub'),v('i-cta-link')),
+  ];
+}
+
+// ══ DISPLAY ══
+function showCard(idx) {
+  if (!cards.length) return;
+  curIdx = idx;
+  document.getElementById('card-frame').innerHTML = cards[idx];
+  document.getElementById('counter').textContent = `${idx+1} / ${cards.length}장`;
+  document.getElementById('btn-prev').disabled = idx===0;
+  document.getElementById('btn-next').disabled = idx===cards.length-1;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  if (document.getElementById('tab-style').style.display!=='none') updateStylePanel(idx);
+}
+
+function renderDots() {
+  const el=document.getElementById('dots'); el.innerHTML='';
+  cards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===0?' active':'');
+    d.onclick=()=>showCard(i);
+    el.appendChild(d);
+  });
+  document.getElementById('btn-prev').disabled=false;
+  document.getElementById('btn-next').disabled=false;
+}
+
+function navigate(dir) { const n=curIdx+dir; if(n>=0&&n<cards.length)showCard(n); }
+
+// ══ DOWNLOAD ══
+async function downloadCurrentCard() {
+  if (!cards.length) return alert('먼저 카드뉴스를 생성해주세요.');
+  const p=document.getElementById('dlp'); p.style.display='block'; p.textContent='⏳ 저장 중...';
+  try {
+    const c=await html2canvas(document.getElementById('card-frame'),{scale:2.25,useCORS:true,backgroundColor:null});
+    const a=document.createElement('a');
+    const base=(v('p-name')||v('i-title')||'petsland').replace(/\s+/g,'_');
+    a.download=`petsland_${base}_card${String(curIdx+1).padStart(2,'0')}.png`;
+    a.href=c.toDataURL('image/png'); a.click();
+    p.textContent='✅ 저장 완료!';
+  } finally { setTimeout(()=>p.style.display='none',1200); }
+}
+
+async function downloadAllCards() {
+  if (!cards.length) return alert('먼저 카드뉴스를 생성해주세요.');
+  const p=document.getElementById('dlp'); p.style.display='block';
+  const base=(v('p-name')||v('i-title')||'petsland').replace(/\s+/g,'_');
+  const frame=document.getElementById('card-frame');
+  for(let i=0;i<cards.length;i++){
+    p.textContent=`⏳ ${i+1} / ${cards.length} 저장 중...`;
+    showCard(i); await new Promise(r=>setTimeout(r,320));
+    const c=await html2canvas(frame,{scale:2.25,useCORS:true,backgroundColor:null});
+    const a=document.createElement('a');
+    a.download=`petsland_${base}_card${String(i+1).padStart(2,'0')}.png`;
+    a.href=c.toDataURL('image/png'); a.click();
+    await new Promise(r=>setTimeout(r,380));
+  }
+  p.textContent=`✅ 전체 ${cards.length}장 저장 완료!`;
+  setTimeout(()=>p.style.display='none',1800);
+}
+</script>
+</body>
+</html>
